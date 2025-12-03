@@ -10,9 +10,22 @@
 
 Disease Predictor is a web app that helps users identify possible diseases based on their symptoms. After experimenting with several machine learning models, we found that **Logistic Regression** gave the best results for our labeled dataset.
 
+This app can be used for basic health consultation: users enter their symptoms and receive a likely disease prediction, which can help guide their next steps.  
+**Note:** This tool is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
+
 - **Backend:** Django REST Framework, PostgreSQL
 - **ML:** scikit-learn (**Logistic Regression**; previously SVM), model artifacts (`model.pkl`, `columns.pkl`, `label_encoder.pkl`)
 - **Frontend:** React.js (details below)
+
+## Key Highlights
+
+- **Fast & Easy:** Get disease predictions in seconds with just a few clicks.
+- **No Medical Knowledge Needed:** Simple symptom selection—no jargon or codes.
+
+- **Privacy First:** No personal health data is stored beyond your account; predictions are not saved.
+- **Anonymous Consultation:** You can use the app without revealing your identity (except for account features).
+- **Admin Dashboard:** Admins can manage data and retrain the model directly from the UI.
+- **Accessible:** Designed for all users, with clear instructions and feedback.
 
 ## Frontend
 
@@ -112,6 +125,14 @@ Our frontend is built with **React.js** and is designed to be simple, intuitive,
 
 6. **Train the model**  
    Visit `GET /api/disease/train/` or use an API client.
+
+## Consultation
+
+You can use Disease Predictor as a quick consultation tool:
+
+- Enter your symptoms and get an instant prediction of possible diseases.
+- Use the results to decide if you should consult a healthcare professional.
+- The app provides basic information, but always seek medical advice for serious or persistent symptoms.
 
 ## Contributing
 

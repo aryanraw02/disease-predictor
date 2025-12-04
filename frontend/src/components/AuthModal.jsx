@@ -405,37 +405,6 @@ export default function AuthModal({
                   )}
                 </button>
               </div>
-
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="px-2 bg-white text-slate-500">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <button
-                  type="button"
-                  onClick={() => alert("Google sign-in placeholder")}
-                  className="w-full inline-flex items-center gap-2 justify-center border-2 border-slate-200 rounded-xl px-4 py-2.5 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all group"
-                >
-                  <span className="w-4 h-4 inline-block group-hover:scale-110 transition-transform">
-                    <svg viewBox="0 0 48 48" className="w-full h-full">
-                      <path
-                        fill="#fbc02d"
-                        d="M43.6 20.5H42V20H24v8h11.3C34 33.6 29.5 36 24 36c-7 0-12.7-5.8-12.7-13S17 10 24 10c3.6 0 6.6 1.2 9 3.3l6.3-6.3C36.8 4 30.9 2 24 2 12.3 2 2.7 11.6 2.7 23.3S12.3 44.7 24 44.7c11.4 0 20.5-8.3 20.5-21.5 0-1.4-.2-2.7-.9-3.7z"
-                      />
-                    </svg>
-                  </span>
-                  <span className="text-xs font-medium">
-                    Sign in with Google
-                  </span>
-                </button>
-              </div>
             </form>
 
             <div className="mt-4 text-xs text-center">

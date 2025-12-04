@@ -10,16 +10,36 @@ export default function Predictor() {
   const navigate = useNavigate();
   const [symptomsList, setSymptomsList] = useState([]);
   const [selectValue, setSelectValue] = useState(null);
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  const [predictions, setPredictions] = useState([]);
+  const [selectedSymptoms, setSelectedSymptoms] = useState(() => {
+    try {
+      const saved = localStorage.getItem("selectedSymptoms");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [selectedSubMap, setSelectedSubMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem("selectedSubMap");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [predictions, setPredictions] = useState(() => {
+    try {
+      const saved = localStorage.getItem("predictions");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(false);
 
   // subsym data: { SymptomName: [sub1, sub2, ...] }
   const [subsymMap, setSubsymMap] = useState({});
   // UI: modal state
   const [openSubModalFor, setOpenSubModalFor] = useState(null);
-  // selected sub-symptoms map: { SymptomName: [sub1, sub2] }
-  const [selectedSubMap, setSelectedSubMap] = useState({});
 
   useEffect(() => {
     async function load() {
@@ -52,8 +72,16 @@ export default function Predictor() {
   }, []);
 
   useEffect(() => {
-    setPredictions([]);
-  }, [selectedSymptoms, selectedSubMap]);
+    localStorage.setItem("selectedSymptoms", JSON.stringify(selectedSymptoms));
+  }, [selectedSymptoms]);
+
+  useEffect(() => {
+    localStorage.setItem("selectedSubMap", JSON.stringify(selectedSubMap));
+  }, [selectedSubMap]);
+
+  useEffect(() => {
+    localStorage.setItem("predictions", JSON.stringify(predictions));
+  }, [predictions]);
 
   function prettifyName(name) {
     if (!name) return "";
@@ -90,6 +118,8 @@ export default function Predictor() {
       delete copy[val];
       return copy;
     });
+    setPredictions([]); // Clear predictions only when symptoms change
+    localStorage.removeItem("predictions");
   }
 
   async function handlePredict() {
@@ -98,18 +128,19 @@ export default function Predictor() {
       return;
     }
     setLoading(true);
-    setPredictions([]);
+    // Do not clear predictions here
     try {
       const payload = { symptoms: selectedSymptoms, sub_map: selectedSubMap };
       const res = await api.post("/predict/", payload);
       const data = res.data || {};
+      let preds = [];
       if (data.predictions) {
-        setPredictions(data.predictions);
+        preds = data.predictions;
       } else if (data.predictions === undefined && data.top) {
-        setPredictions(data.top);
-      } else {
-        setPredictions([]);
+        preds = data.top;
       }
+      setPredictions(preds);
+      localStorage.setItem("predictions", JSON.stringify(preds));
       if (data.emergency) {
         // Show alert with option to consult
         const shouldConsult = window.confirm(
@@ -131,6 +162,9 @@ export default function Predictor() {
     setSelectedSymptoms([]);
     setSelectedSubMap({});
     setPredictions([]);
+    localStorage.removeItem("selectedSymptoms");
+    localStorage.removeItem("selectedSubMap");
+    localStorage.removeItem("predictions");
   }
 
   // submodal helpers

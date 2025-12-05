@@ -1,6 +1,6 @@
 # Disease Predictor
 
-**Project:** Disease Prediction Application (Final year major project)  
+**Project:** Medlytics - Disease Prediction Application   
 **Team:** Aryan Rawtani + 2 members  
 **Status:** Backend ready (`ready/demo-backend` branch)
 
@@ -45,7 +45,7 @@ Our frontend is built with **React.js** and is designed to be simple, intuitive,
    Users can sign up and log in. Tokens are stored securely (usually in local storage) and sent with each API request.
 
 2. **Symptom Input:**  
-   Just pick your symptoms from the list. The app sends them as a JSON array to the backend’s `/api/disease/predict/` endpoint.
+   Just pick your symptoms from the list.Then you can select the sub=symptoms. The app sends them as a JSON array to the backend’s `/api/disease/predict/` endpoint.
 
 3. **Prediction Results:**  
    The predicted disease (and any extra info) is displayed right away.

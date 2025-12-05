@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from joblib import dump, load as joblib_load
 
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -146,24 +146,27 @@ def train(request):
     X_noisy = pd.DataFrame(X_noisy, columns=X.columns)
 
     models = {
-        "svm_rbf": lambda: SVC(probability=True, kernel="rbf"),
-        "random_forest": lambda: RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1),
+        "svm_rbf": lambda: SVC(probability=True, kernel="rbf", C=1.0, gamma="scale", random_state=42),
+        "random_forest": lambda: RandomForestClassifier(
+            n_estimators=200, random_state=42, n_jobs=-1, max_depth=20, min_samples_leaf=2
+        ),
         "naive_bayes": lambda: GaussianNB(),
-        "knn": lambda: KNeighborsClassifier(n_neighbors=5),
-        "logistic_regression": lambda: LogisticRegression(max_iter=1000),
-        "decision_tree": lambda: DecisionTreeClassifier(random_state=42),
+        "knn": lambda: KNeighborsClassifier(n_neighbors=5, weights="distance"),
+        "logistic_regression": lambda: LogisticRegression(max_iter=1000, C=1.0, solver="lbfgs"),
+        "decision_tree": lambda: DecisionTreeClassifier(random_state=42, max_depth=20, min_samples_leaf=2),
     }
 
     accuracies = {}
     best_name = None
     best_score = -1
 
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
     for name, make_model in models.items():
         model = make_model()
-        scores = cross_val_score(model, X_noisy, y_enc, cv=5)
+        scores = cross_val_score(model, X_noisy, y_enc, cv=skf)
         avg = scores.mean()
         accuracies[name] = float(avg)
-
         if avg > best_score:
             best_score = avg
             best_name = name
@@ -171,15 +174,33 @@ def train(request):
     best_model = models[best_name]()
     best_model.fit(X_noisy, y_enc)
 
+    # compute training accuracy to compare with cross_val_score
+    training_accuracy = float(best_model.score(X_noisy, y_enc))
+    overfitting = training_accuracy - float(best_score) > 0.1
+    generalization_gap = round(training_accuracy - float(best_score), 4)
+    note = "Potential overfitting" if overfitting else "Fit looks reasonable"
+
     dump(best_model, MODEL_PATH)
     dump(list(X_noisy.columns), COLS_PATH)
     dump(le, LE_PATH)
-    dump({"best_model": best_name, "accuracies": accuracies}, LAST_SCORES_PATH)
+    dump({
+        "best_model": best_name,
+        "accuracies": accuracies,
+        "training_accuracy": training_accuracy,
+        "best_accuracy": float(best_score),
+        "generalization_gap": generalization_gap,
+        "overfitting": overfitting,
+        "note": note
+    }, LAST_SCORES_PATH)
 
     return JsonResponse({
         "status": "trained",
         "best_model": best_name,
         "best_accuracy": float(best_score),
+        "training_accuracy": training_accuracy,
+        "generalization_gap": generalization_gap,
+        "overfitting": overfitting,
+        "note": note,
         "accuracies": accuracies,
     })
 

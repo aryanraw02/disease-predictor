@@ -81,7 +81,7 @@ Our frontend is built with **React.js** and is designed to be simple, intuitive,
 - User registration & token-based authentication (DRF TokenAuth)
 - Train a **Logistic Regression** model from `Training.csv`  
   _(We tried different models, but Logistic Regression worked best for our labeled data)_
-- Predict diseases from symptoms
+- Predict diseases from symptoms and sub-symtomps and suggest medicines and tests for particular diseases.
 - (Optional) Insert patient data from CSV for admin view
 
 ### API Endpoints
@@ -94,6 +94,8 @@ Our frontend is built with **React.js** and is designed to be simple, intuitive,
   Example body:
   ```json
   { "symptoms": ["itching", "skin_rash", "chills"] }
+  
+  {"sub-symptoms":[redness, etc]
   ```
 - `POST /api/disease/insertpd/` — (Admin) Insert CSV records into DB
 
